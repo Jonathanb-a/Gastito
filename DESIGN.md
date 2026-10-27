@@ -102,4 +102,4 @@ Reglas:
 
 ## Pendiente
 
-Componentes y pantallas (botón, tarjeta, fila de gasto, hoja de captura) se construirán sobre estos tokens en la siguiente fase. Los colores de categorías se definen junto con el modelo de datos.
+Componentes y pantallas (botón, tarjeta, fila de gasto, hoja de captura) se construirán sobre estos tokens en la siguiente fase. Los colores de categorías viven en `src/data/categories.ts` (ocho colores medios con contraste ≥ 3:1 sobre las superficies de ambos temas, verificado por pruebas); úsalos para el icono y su fondo al 12–15 % de opacidad.
