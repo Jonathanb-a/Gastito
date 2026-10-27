@@ -35,7 +35,7 @@ export function CalendarPicker({ value, maxDate, onChange }: Props) {
   };
 
   return (
-    <View className="rounded-lg border border-border bg-surface p-3">
+    <View className="rounded-lg border border-border bg-surface p-1.5">
       <View className="mb-2 flex-row items-center justify-between">
         <PressableScale
           onPress={() => setView(addMonths(view, -1))}
@@ -78,22 +78,28 @@ export function CalendarPicker({ value, maxDate, onChange }: Props) {
               value.getFullYear() === view.year && value.getMonth() === view.month && value.getDate() === day;
             const isToday = date.getTime() === today.getTime();
             return (
-              <View key={i} className="h-11 flex-1 items-center justify-center">
+              <View key={i} className="h-11 flex-1">
+                {/* La zona táctil ocupa toda la celda (≥ 44 px de alto); el círculo es solo visual. */}
                 <PressableScale
                   onPress={() => pick(day)}
                   disabled={disabled}
+                  wrapperStyle={{ flex: 1 }}
                   accessibilityRole="button"
                   accessibilityLabel={`${WEEKDAYS[i]} ${day} de ${monthName(view.month)}${isToday ? ", hoy" : ""}`}
                   accessibilityState={{ selected, disabled }}
-                  className={`h-10 w-10 items-center justify-center rounded-full ${
-                    selected ? "bg-primary" : isToday ? "border border-primary" : ""
-                  } ${disabled ? "opacity-40" : ""}`}
+                  className={`h-11 items-center justify-center ${disabled ? "opacity-40" : ""}`}
                 >
-                  <Text
-                    className={`text-body ${selected ? "font-semibold text-primary-foreground" : "text-foreground"}`}
+                  <View
+                    className={`h-10 w-10 items-center justify-center rounded-full ${
+                      selected ? "bg-primary" : isToday ? "border border-primary" : ""
+                    }`}
                   >
-                    {day}
-                  </Text>
+                    <Text
+                      className={`text-body ${selected ? "font-semibold text-primary-foreground" : "text-foreground"}`}
+                    >
+                      {day}
+                    </Text>
+                  </View>
                 </PressableScale>
               </View>
             );

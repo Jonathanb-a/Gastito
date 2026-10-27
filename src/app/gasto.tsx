@@ -10,6 +10,7 @@ import { DateField } from "@/components/DateField";
 import { TextField } from "@/components/TextField";
 import { CATEGORIES, getCategory, type CategoryId } from "@/data/categories";
 import { useExpenses } from "@/data/expense-store";
+import { lightImpact } from "@/lib/haptics";
 import { formatMoney } from "@/lib/money";
 import { validateExpenseForm, type FormErrors } from "@/lib/validation";
 import { useTheme } from "@/theme/theme";
@@ -60,6 +61,7 @@ export default function ExpenseFormScreen() {
       const data = { amount: result.amount, categoryId, note, date: date.toISOString() };
       if (existing) await update(existing.id, data);
       else await add(data);
+      lightImpact();
       close();
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : "No se pudo guardar el gasto.");

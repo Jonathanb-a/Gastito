@@ -83,16 +83,19 @@ Constantes en `src/theme/motion.ts`. La animación aclara qué pasó; nunca es d
 | Qué | Cómo | Valores |
 |---|---|---|
 | Feedback al presionar | Escala + spring `press` | `pressScale` = 0.97, sin rebote |
-| Entrada de elementos | `timing.base` (ease-out) | 240 ms, con desplazamiento ≤ 16 px y opacidad 0→1 |
+| Entrada de tarjetas y filas | `enterUp(index)` = `FadeInDown`, ease-out | 240 ms; subida corta y opacidad 0→1; `Reveal` y `ListItem` |
 | Salida | `timing.exit` (ease-in) | 160 ms; salir es más rápido que entrar |
 | Cambios de estado (chip activo, switch) | `timing.fast` | 160 ms |
 | Hojas y tarjetas que se acomodan | Spring `smooth` | amortiguado, sin rebote |
-| Confirmación (gasto guardado) | Spring `bouncy` | un rebote leve, una sola vez |
-| Lista al entrar | Escalonado | 40 ms por elemento, tope 300 ms en total |
+| Confirmación (gasto guardado) | Spring `bouncy` | la tarjeta del total crece 3 % y vuelve, una sola vez; más vibración ligera en móvil |
+| Agregar / borrar una fila | `enterUp` al entrar, `exitFade` (160 ms) al salir, `listLayout` (240 ms) para que las demás se acomoden | solo las filas nuevas animan su entrada, no las que aparecen al hacer scroll |
+| Gráfica por categoría | `scaleX` de 0 al porcentaje, `timing.slow` (360 ms), escalonada | también anima cuando el valor cambia |
+| Escalonado | `staggerDelay(index)` | 40 ms por elemento, tope 300 ms en total |
 | Cambio de importe | Fundido cruzado `timing.fast` | no cuentes dígitos animados |
 
 Reglas:
 
+0. **Reducir movimiento:** todas las animaciones usan `reduceMotion` de `motion.ts` (`ReduceMotion.System`): con la opción del sistema o del navegador activa saltan al valor final, sin desplazamiento ni escala. El rebote del total y la escala al pulsar también se omiten.
 1. **Solo `transform` y `opacity`.** No animes `width`, `height`, `margin` ni `top/left`, que fuerzan layout. Para listas que cambian de tamaño usa `layout` transitions de Reanimated.
 2. **Menos de 400 ms** para cualquier transición; interacciones directas (toque) responden en < 100 ms.
 3. **Reduce motion:** si `useReducedMotion()` es `true` o el sistema lo pide, sustituye desplazamientos y escalas por un fundido de ≤ 160 ms. Ninguna información debe depender de una animación.
@@ -113,10 +116,17 @@ Accesibilidad aplicada:
 - Errores de formulario como texto (no solo color) con rol `alert` y región `polite`; se borran al corregir el campo.
 - Importes y fechas con etiqueta hablada ("85 pesos con 50 centavos", "27 de octubre de 2026").
 - Iconos de categoría decorativos: el nombre siempre va en texto.
-- Zonas táctiles ≥ 44 px; el movimiento respeta "reducir movimiento".
+- Zonas táctiles ≥ 44 px (botones, chips, flechas, borrar, días del calendario en alto). En pantallas de 320 px de ancho los días del calendario miden ≈ 39 px de ancho (44 desde ≈ 360 px); el mínimo WCAG 2.2 es 24 px.
+- Diálogo de confirmación: el foco pasa al título al abrir (web y lectores de pantalla), Escape y "atrás" de Android cancelan.
+- Web: anillo de foco visible con teclado (`src/theme/web-focus.ts`) y `<html lang="es">` (`src/app/+html.tsx`).
+- El movimiento respeta "reducir movimiento".
+
+Háptica: `src/lib/haptics.ts` (`expo-haptics`, impacto ligero) al guardar un gasto; solo en iOS/Android, en web no hace nada.
 
 Trampas conocidas:
 
+- Los `Keyframe` personalizados de Reanimated no se insertan en web (la página se queda con elementos en `position: absolute`). Usa las animaciones predefinidas (`FadeInDown`, `FadeOut`, `LinearTransition`).
+- `Animated.FlatList` tampoco procesa `contentContainerClassName`: usa `contentContainerStyle`.
 - Los componentes de `react-native-reanimated` (`Animated.View`) **no procesan `className`**: usa `style` (o envuelve con un `View` con `className`).
 - Los colores de categorías viven en `src/data/categories.ts` (≥ 3:1 sobre ambas superficies, verificado por pruebas); úsalos para el icono y su fondo al 12–15 % de opacidad.
 - `darkMode: "class"` en `tailwind.config.js` evita un error de NativeWind en web; no usamos variantes `dark:`.

@@ -35,7 +35,7 @@ export function ExpenseRow({ expense, onPress, onDelete }: Props) {
       >
         <CategoryIcon categoryId={expense.categoryId} />
         <View className="flex-1">
-          <Text className="text-body font-medium text-foreground" numberOfLines={1}>
+          <Text className="text-body font-medium text-foreground" numberOfLines={2}>
             {title}
           </Text>
           <Text className="text-footnote text-muted" numberOfLines={1}>

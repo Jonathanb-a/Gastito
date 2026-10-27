@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { FlatList, ScrollView, Text, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { AddButton } from "@/components/AddButton";
 import { Chip } from "@/components/Chip";
@@ -8,6 +9,7 @@ import { CategoryIcon } from "@/components/CategoryIcon";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { ExpenseRow } from "@/components/ExpenseRow";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
+import { ListItem } from "@/components/Reveal";
 import { Screen } from "@/components/Screen";
 import { CATEGORIES, getCategory, type CategoryId } from "@/data/categories";
 import { useExpenses } from "@/data/expense-store";
@@ -15,6 +17,7 @@ import type { Expense } from "@/data/types";
 import { monthOf } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { filterExpenses, total } from "@/lib/stats";
+import { listLayout } from "@/theme/motion";
 
 export default function HistoryScreen() {
   const router = useRouter();
@@ -23,6 +26,10 @@ export default function HistoryScreen() {
   const [month, setMonth] = useState(currentMonth);
   const [categoryId, setCategoryId] = useState<CategoryId | null>(null);
   const [toDelete, setToDelete] = useState<Expense | null>(null);
+
+  // Ids presentes al abrir la pantalla: solo los gastos nuevos animan su entrada (no al hacer scroll).
+  const initialIds = useRef<Set<string> | null>(null);
+  if (initialIds.current === null && !loading) initialIds.current = new Set(expenses.map((e) => e.id));
 
   const filtered = useMemo(() => filterExpenses(expenses, { month, categoryId }), [expenses, month, categoryId]);
   const sum = total(filtered);
@@ -35,7 +42,7 @@ export default function HistoryScreen() {
       </Text>
       <MonthSwitcher value={month} max={currentMonth} onChange={setMonth} />
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-4" contentContainerClassName="gap-2 px-4">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
         <View accessibilityRole="radiogroup" accessibilityLabel="Filtrar por categoría" className="flex-row gap-2">
           <Chip label="Todas" selected={categoryId === null} onPress={() => setCategoryId(null)} />
           {CATEGORIES.map((c) => (
@@ -58,16 +65,19 @@ export default function HistoryScreen() {
 
   return (
     <Screen>
-      <FlatList
+      <Animated.FlatList
         data={filtered}
         keyExtractor={(e) => e.id}
         ListHeaderComponent={header}
+        itemLayoutAnimation={listLayout}
         renderItem={({ item }) => (
-          <ExpenseRow
-            expense={item}
-            onPress={() => router.push({ pathname: "/gasto", params: { id: item.id } })}
-            onDelete={() => setToDelete(item)}
-          />
+          <ListItem inFlatList animateEntering={initialIds.current !== null && !initialIds.current.has(item.id)}>
+            <ExpenseRow
+              expense={item}
+              onPress={() => router.push({ pathname: "/gasto", params: { id: item.id } })}
+              onDelete={() => setToDelete(item)}
+            />
+          </ListItem>
         )}
         ItemSeparatorComponent={() => <View className="h-3" />}
         ListEmptyComponent={
@@ -79,7 +89,8 @@ export default function HistoryScreen() {
             </Text>
           )
         }
-        contentContainerClassName="w-full max-w-xl self-center px-4 pb-28 pt-4"
+        // Animated.FlatList no procesa className.
+        contentContainerStyle={{ width: "100%", maxWidth: 576, alignSelf: "center", paddingHorizontal: 16, paddingTop: 16, paddingBottom: 112 }}
       />
       <AddButton />
       <ConfirmDialog

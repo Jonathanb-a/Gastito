@@ -1,7 +1,8 @@
-import { Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut, ReduceMotion } from "react-native-reanimated";
+import { useEffect, useRef, type ComponentRef } from "react";
+import { AccessibilityInfo, BackHandler, findNodeHandle, Platform, Text, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { duration } from "@/theme/motion";
+import { duration, easing, reduceMotion } from "@/theme/motion";
 
 import { Button } from "./Button";
 
@@ -17,14 +18,39 @@ type Props = {
 /**
  * Confirmación para acciones destructivas. Es una capa propia (no Alert ni Modal) para que
  * se vea igual en web y móvil. Debe renderizarse como hijo directo de la pantalla.
+ * Al abrir mueve el foco al diálogo; Escape (web) y "atrás" (Android) lo cancelan.
  */
 export function ConfirmDialog({ visible, title, message, confirmLabel, onConfirm, onCancel }: Props) {
+  const titleRef = useRef<ComponentRef<typeof Text>>(null);
+  const cancelRef = useRef(onCancel);
+  cancelRef.current = onCancel;
+
+  useEffect(() => {
+    if (!visible) return;
+    if (Platform.OS === "web") {
+      // La capa empieza oculta mientras anima su entrada; el foco solo entra cuando ya es visible.
+      const timer = setTimeout(() => (titleRef.current as unknown as HTMLElement | null)?.focus?.(), 120);
+      const onKey = (e: KeyboardEvent) => e.key === "Escape" && cancelRef.current();
+      document.addEventListener("keydown", onKey);
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener("keydown", onKey);
+      };
+    }
+    const node = findNodeHandle(titleRef.current);
+    if (node) AccessibilityInfo.setAccessibilityFocus(node);
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      cancelRef.current();
+      return true;
+    });
+    return () => sub.remove();
+  }, [visible]);
+
   if (!visible) return null;
-  const motion = ReduceMotion.System;
   return (
     <Animated.View
-      entering={FadeIn.duration(duration.fast).reduceMotion(motion)}
-      exiting={FadeOut.duration(duration.fast).reduceMotion(motion)}
+      entering={FadeIn.duration(duration.fast).reduceMotion(reduceMotion)}
+      exiting={FadeOut.duration(duration.fast).easing(easing.in).reduceMotion(reduceMotion)}
       // Reanimated no procesa className, por eso estilos en línea.
       style={{
         position: "absolute",
@@ -42,10 +68,9 @@ export function ConfirmDialog({ visible, title, message, confirmLabel, onConfirm
     >
       <View
         accessibilityRole="alert"
-        accessibilityLabel={`${title}. ${message}`}
         className="w-full max-w-sm gap-4 rounded-xl border border-border bg-surface p-6"
       >
-        <Text accessibilityRole="header" className="text-title text-foreground">
+        <Text ref={titleRef} tabIndex={-1} accessibilityRole="header" className="text-title text-foreground">
           {title}
         </Text>
         <Text className="text-body text-muted">{message}</Text>

@@ -1,4 +1,5 @@
 import "../../global.css";
+import "@/theme/web-focus";
 
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
