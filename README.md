@@ -1,6 +1,6 @@
-# Control de gastos
+# Gastito
 
-App para registrar y revisar gastos personales. Un solo código para **iOS, Android y web**, en español, con tema claro y oscuro. Los datos se guardan en el propio dispositivo (no hay servidor ni cuenta).
+Gastito es una app de control de gastos para registrar y revisar gastos personales. Un solo código para **iOS, Android y web**, en español, con tema claro y oscuro. Los datos se guardan en el propio dispositivo (no hay servidor ni cuenta).
 
 | Inicio | Inicio (oscuro) | Historial | Nuevo gasto |
 |:---:|:---:|:---:|:---:|
