@@ -3,9 +3,12 @@ const token = (name) => `rgb(var(--color-${name}) / <alpha-value>)`;
 
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  // "class" evita un error de NativeWind en web con el modo "media"; no usamos variantes dark:.
+  darkMode: "class",
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      // Las variables --color-* las define ThemeProvider (src/theme/theme.tsx).
       colors: {
         background: token("background"),
         surface: { DEFAULT: token("surface"), muted: token("surface-muted") },

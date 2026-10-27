@@ -141,6 +141,11 @@ export function createExpenseStore(storage: KeyValueStorage, now: () => Date = (
       await mutate(state.expenses.map((e) => (e.id === id ? updated : e)));
       return updated;
     },
+    /** Borra todos los gastos. No se vuelven a sembrar ejemplos. */
+    async clear(): Promise<void> {
+      await load();
+      await mutate([]);
+    },
     /** Borra un gasto; no hace nada si no existe. */
     async remove(id: string): Promise<void> {
       await load();
@@ -172,5 +177,6 @@ export function useExpenses(store: ExpenseStore = expenseStore) {
     add: store.add,
     update: store.update,
     remove: store.remove,
+    clear: store.clear,
   };
 }

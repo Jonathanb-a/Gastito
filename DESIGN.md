@@ -2,11 +2,11 @@
 
 App móvil (iOS, Android y web) para registrar y revisar gastos. Tono: claro, calmado y confiable; los números son los protagonistas.
 
-**Fuente de verdad:** los colores viven en [`global.css`](global.css) (variables CSS), se exponen como clases en [`tailwind.config.js`](tailwind.config.js) y la animación en [`src/theme/motion.ts`](src/theme/motion.ts). Si cambias un valor, cámbialo ahí y actualiza este documento.
+**Fuente de verdad:** los colores viven en [`src/theme/colors.js`](src/theme/colors.js); `ThemeProvider` ([`src/theme/theme.tsx`](src/theme/theme.tsx)) los publica como variables CSS (`--color-*`) y se exponen como clases en [`tailwind.config.js`](tailwind.config.js) y la animación en [`src/theme/motion.ts`](src/theme/motion.ts). Si cambias un valor, cámbialo ahí y actualiza este documento.
 
 ## Color
 
-El tema claro/oscuro sigue el del sistema. Los componentes usan solo nombres semánticos (`bg-surface`, `text-muted`), nunca hex, y el cambio de tema es automático, sin variantes `dark:`.
+El usuario elige Sistema, Claro u Oscuro en Ajustes (se guarda en el dispositivo); "Sistema" sigue el del dispositivo. Los componentes usan solo nombres semánticos (`bg-surface`, `text-muted`), nunca hex, y el cambio de tema es automático, sin variantes `dark:`.
 
 | Token (clase) | Claro | Oscuro | Uso |
 |---|---|---|---|
@@ -29,7 +29,7 @@ Las opacidades funcionan (`bg-primary/10`) porque las variables son tripletas RG
 ### Contraste (WCAG 2.2 AA)
 
 - Texto normal: ≥ 4.5:1. Componentes de UI e iconos con significado (`outline`): ≥ 3:1.
-- `npm run check:contrast` calcula 40 pares en ambos temas y falla si alguno no cumple. Corre ese script al tocar la paleta.
+- `npm run check:contrast` calcula 42 pares en ambos temas y falla si alguno no cumple. Corre ese script al tocar la paleta.
 - Los colores `success`, `warning`, `danger` e `info` pasan 4.5:1 sobre `background` y `surface`. **No** los uses sobre `surface-muted` ni sobre `primary`, que no se verifican.
 - Nunca comuniques estado solo con color: acompáñalo con icono o texto (p. ej. "−$120" y flecha, no solo rojo).
 
@@ -100,6 +100,23 @@ Reglas:
 5. **Una cosa a la vez:** máximo un movimiento principal por pantalla; el resto, fundidos.
 6. Los colores no se animan con el sistema de clases; si hace falta, anima `opacity` entre dos capas.
 
-## Pendiente
+## Implementación
 
-Componentes y pantallas (botón, tarjeta, fila de gasto, hoja de captura) se construirán sobre estos tokens en la siguiente fase. Los colores de categorías viven en `src/data/categories.ts` (ocho colores medios con contraste ≥ 3:1 sobre las superficies de ambos temas, verificado por pruebas); úsalos para el icono y su fondo al 12–15 % de opacidad.
+Pantallas (Expo Router, `src/app`): pestañas **Inicio**, **Historial** y **Ajustes** en `(tabs)`, y el formulario **Gasto** (nuevo/editar) como modal en `gasto.tsx`.
+
+Componentes (`src/components`): `Button`/`PressableScale` (escala al pulsar), `Chip` (opción tipo radio), `TextField`, `DateField` + `CalendarPicker` (calendario propio, igual en web y móvil), `ExpenseRow`, `CategoryChart`, `ConfirmDialog` (capa propia, no `Alert`, que no existe en web), `MonthSwitcher`, `AddButton`.
+
+Accesibilidad aplicada:
+
+- Todo texto en español; botones con `accessibilityLabel` y, cuando ayuda, `accessibilityHint`.
+- Encabezados con `accessibilityRole="header"`; grupos de opciones como `radiogroup` con `checked`.
+- Errores de formulario como texto (no solo color) con rol `alert` y región `polite`; se borran al corregir el campo.
+- Importes y fechas con etiqueta hablada ("85 pesos con 50 centavos", "27 de octubre de 2026").
+- Iconos de categoría decorativos: el nombre siempre va en texto.
+- Zonas táctiles ≥ 44 px; el movimiento respeta "reducir movimiento".
+
+Trampas conocidas:
+
+- Los componentes de `react-native-reanimated` (`Animated.View`) **no procesan `className`**: usa `style` (o envuelve con un `View` con `className`).
+- Los colores de categorías viven en `src/data/categories.ts` (≥ 3:1 sobre ambas superficies, verificado por pruebas); úsalos para el icono y su fondo al 12–15 % de opacidad.
+- `darkMode: "class"` en `tailwind.config.js` evita un error de NativeWind en web; no usamos variantes `dark:`.

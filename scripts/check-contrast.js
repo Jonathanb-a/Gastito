@@ -1,22 +1,13 @@
-// Valida contraste WCAG AA de los tokens de global.css (claro y oscuro).
-const fs = require("fs");
-const path = require("path");
+// Valida contraste WCAG AA de los tokens de src/theme/colors.js (claro y oscuro).
+const { light, dark } = require("../src/theme/colors");
 
-const css = fs.readFileSync(path.join(__dirname, "..", "global.css"), "utf8");
-const [light, dark] = [css.split("@media")[0], css.split("@media")[1]].map((block) => {
-  const out = {};
-  for (const m of block.matchAll(/--color-([a-z-]+):\s*(\d+) (\d+) (\d+)/g)) {
-    out[m[1]] = [+m[2], +m[3], +m[4]];
-  }
-  return out;
-});
-
-const lum = ([r, g, b]) => {
-  const c = [r, g, b].map((v) => {
+const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const lum = (hex) => {
+  const [r, g, b] = rgb(hex).map((v) => {
     v /= 255;
     return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
   });
-  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
 const ratio = (a, b) => {
   const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
@@ -32,6 +23,7 @@ const pairs = [
   ["muted", "surface", 4.5],
   ["muted", "surface-muted", 4.5],
   ["primary-foreground", "primary", 4.5],
+  ["primary-foreground", "danger", 4.5],
   ["primary", "background", 4.5],
   ["primary", "surface", 4.5],
   ["success", "surface", 4.5],

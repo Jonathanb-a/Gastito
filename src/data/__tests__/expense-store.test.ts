@@ -71,6 +71,17 @@ describe("agregar, editar, borrar", () => {
     expect(store.getState().expenses).toHaveLength(0);
   });
 
+  it("clear borra todo y no vuelve a sembrar", async () => {
+    const storage = memoryStorage();
+    const store = newStore(storage);
+    await store.clear();
+    expect(store.getState().expenses).toHaveLength(0);
+
+    const again = newStore(storage);
+    await again.load();
+    expect(again.getState().expenses).toHaveLength(0);
+  });
+
   it("rechaza datos inválidos sin tocar el estado", async () => {
     const store = newStore(memoryStorage(JSON.stringify({ version: 1, expenses: [] })));
     await expect(store.add({ ...valid, amount: 0 })).rejects.toThrow("mayor que cero");

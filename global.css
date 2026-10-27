@@ -3,40 +3,6 @@
 @tailwind utilities;
 
 /*
- * Design tokens (colores). Fuente única de verdad: ver DESIGN.md.
- * Valores como "R G B" para soportar opacidad: bg-primary/10.
- * `npm run check:contrast` valida el contraste AA de estos pares.
+ * Los colores (--color-*) los define ThemeProvider en src/theme/theme.tsx a partir de
+ * src/theme/colors.js, para poder cambiar entre claro, oscuro y sistema sin recargar.
  */
-:root {
-  --color-background: 248 250 252; /* #F8FAFC */
-  --color-surface: 255 255 255; /* #FFFFFF */
-  --color-surface-muted: 241 245 249; /* #F1F5F9 */
-  --color-border: 203 213 225; /* #CBD5E1 */
-  --color-outline: 100 116 139; /* #64748B */
-  --color-foreground: 15 23 42; /* #0F172A */
-  --color-muted: 71 85 105; /* #475569 */
-  --color-primary: 15 118 110; /* #0F766E */
-  --color-primary-foreground: 255 255 255; /* #FFFFFF */
-  --color-success: 21 128 61; /* #15803D */
-  --color-warning: 180 83 9; /* #B45309 */
-  --color-danger: 185 28 28; /* #B91C1C */
-  --color-info: 29 78 216; /* #1D4ED8 */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: 11 18 32; /* #0B1220 */
-    --color-surface: 17 26 44; /* #111A2C */
-    --color-surface-muted: 26 36 56; /* #1A2438 */
-    --color-border: 38 51 76; /* #26334C */
-    --color-outline: 118 134 158; /* #76869E */
-    --color-foreground: 241 245 249; /* #F1F5F9 */
-    --color-muted: 163 177 198; /* #A3B1C6 */
-    --color-primary: 45 212 191; /* #2DD4BF */
-    --color-primary-foreground: 4 47 46; /* #042F2E */
-    --color-success: 74 222 128; /* #4ADE80 */
-    --color-warning: 251 191 36; /* #FBBF24 */
-    --color-danger: 248 113 113; /* #F87171 */
-    --color-info: 96 165 250; /* #60A5FA */
-  }
-}
