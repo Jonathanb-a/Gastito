@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import type { ComponentProps } from "react";
-import type { ColorValue } from "react-native";
+import { Platform, type ColorValue } from "react-native";
 
 import { useTheme } from "@/theme/theme";
 
@@ -21,8 +21,13 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
+        // En web la barra mide 48 px y recortaba la etiqueta de 12 px; en móvil la altura la calcula la navegación (con área segura).
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          ...(Platform.OS === "web" ? { height: 72, paddingTop: 6, paddingBottom: 8 } : null),
+        },
+        tabBarLabelStyle: { fontSize: 12, lineHeight: 16, fontWeight: "600" },
         sceneStyle: { backgroundColor: colors.background },
       }}
     >

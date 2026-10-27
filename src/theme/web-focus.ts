@@ -1,9 +1,13 @@
 import { Platform } from "react-native";
 
 /**
+ * Ajustes solo de web. Con web.output "single" Expo no usa +html.tsx, así que el idioma se fija aquí.
+ *
  * Anillo de foco visible para navegación con teclado en web (React Native Web lo quita).
  * Usa el color primario del tema (3:1 mínimo sobre las superficies, ver DESIGN.md).
  */
+if (Platform.OS === "web" && typeof document !== "undefined") document.documentElement.lang = "es";
+
 if (Platform.OS === "web" && typeof document !== "undefined" && !document.getElementById("web-focus-ring")) {
   const style = document.createElement("style");
   style.id = "web-focus-ring";

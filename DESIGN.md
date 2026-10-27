@@ -118,7 +118,7 @@ Accesibilidad aplicada:
 - Iconos de categoría decorativos: el nombre siempre va en texto.
 - Zonas táctiles ≥ 44 px (botones, chips, flechas, borrar, días del calendario en alto). En pantallas de 320 px de ancho los días del calendario miden ≈ 39 px de ancho (44 desde ≈ 360 px); el mínimo WCAG 2.2 es 24 px.
 - Diálogo de confirmación: el foco pasa al título al abrir (web y lectores de pantalla), Escape y "atrás" de Android cancelan.
-- Web: anillo de foco visible con teclado (`src/theme/web-focus.ts`) y `<html lang="es">` (`src/app/+html.tsx`).
+- Web: anillo de foco visible con teclado (`src/theme/web-focus.ts`) y `<html lang="es">` fijado en ejecución (con `web.output: "single"` Expo ignora `+html.tsx`).
 - El movimiento respeta "reducir movimiento".
 
 Háptica: `src/lib/haptics.ts` (`expo-haptics`, impacto ligero) al guardar un gasto; solo en iOS/Android, en web no hace nada.
